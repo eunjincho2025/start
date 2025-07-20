@@ -1,0 +1,1252 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>치매 예방 게임</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0e7ff 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2563eb;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid #d1d5db;
+            color: #374151;
+        }
+
+        .btn-outline:hover {
+            background: #f9fafb;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 24px;
+            text-align: center;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .card-content {
+            padding: 24px;
+        }
+
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin-top: 32px;
+        }
+
+        .game-card {
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+
+        .game-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .game-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            font-size: 32px;
+        }
+
+        .icon-blue { background: #3b82f6; }
+        .icon-green { background: #10b981; }
+        .icon-purple { background: #8b5cf6; }
+        .icon-orange { background: #f59e0b; }
+
+        .title {
+            font-size: 32px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 16px;
+            color: #1f2937;
+        }
+
+        .subtitle {
+            font-size: 18px;
+            color: #6b7280;
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .game-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .game-description {
+            color: #6b7280;
+            margin-bottom: 20px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .score-display {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .memory-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .memory-card {
+            aspect-ratio: 1;
+            border: none;
+            border-radius: 8px;
+            font-size: 32px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .memory-card.flipped {
+            background: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .memory-card.hidden-card {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .memory-card.hidden-card:hover {
+            background: #2563eb;
+        }
+
+        .number-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            max-width: 300px;
+            margin: 0 auto;
+        }
+
+        .number-btn {
+            aspect-ratio: 1;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .color-btn {
+            aspect-ratio: 1;
+            border: 4px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .color-btn.active {
+            border-color: white;
+            transform: scale(1.1);
+            box-shadow: 0 8px 25px -3px rgba(0, 0, 0, 0.3);
+        }
+
+        .color-red { background: #ef4444; }
+        .color-blue { background: #3b82f6; }
+        .color-green { background: #10b981; }
+        .color-yellow { background: #f59e0b; }
+        .color-purple { background: #8b5cf6; }
+        .color-pink { background: #ec4899; }
+
+        .math-problem {
+            font-size: 48px;
+            font-weight: bold;
+            text-align: center;
+            margin: 48px 0;
+            color: #1f2937;
+        }
+
+        .math-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .math-btn {
+            aspect-ratio: 1;
+            font-size: 24px;
+            font-weight: bold;
+            padding: 32px;
+        }
+
+        .feedback {
+            text-align: center;
+            padding: 24px;
+            border-radius: 8px;
+            margin: 24px 0;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .feedback.correct {
+            background: #dcfce7;
+            color: #166534;
+            border: 2px solid #bbf7d0;
+        }
+
+        .feedback.wrong {
+            background: #fef2f2;
+            color: #dc2626;
+            border: 2px solid #fecaca;
+        }
+
+        .sequence-display {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin: 24px 0;
+        }
+
+        .sequence-number {
+            width: 64px;
+            height: 64px;
+            background: #3b82f6;
+            color: white;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            transition: opacity 0.5s;
+        }
+
+        .user-sequence {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin: 24px 0;
+        }
+
+        .user-number {
+            width: 48px;
+            height: 48px;
+            background: #10b981;
+            color: white;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .empty-slot {
+            width: 48px;
+            height: 48px;
+            background: #e5e7eb;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #9ca3af;
+        }
+
+        .pattern-indicators {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin: 16px 0;
+        }
+
+        .pattern-dot {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid #d1d5db;
+        }
+
+        @media (max-width: 768px) {
+            .game-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .memory-grid {
+                max-width: 300px;
+            }
+            
+            .math-problem {
+                font-size: 36px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 메인 메뉴 -->
+        <div id="main-menu">
+            <div class="title">🧠 치매 예방 게임</div>
+            <div class="subtitle">재미있는 게임으로 두뇌를 건강하게 유지하세요!</div>
+            
+            <div class="game-grid">
+                <div class="card game-card" onclick="startGame('memory')">
+                    <div class="card-header">
+                        <div class="game-icon icon-blue">🧠</div>
+                        <div class="game-title">기억력 카드 게임</div>
+                        <div class="game-description">같은 그림의 카드를 찾아 기억력을 향상시키세요</div>
+                    </div>
+                    <div class="card-content">
+                        <button class="btn btn-primary" style="width: 100%; padding: 16px; font-size: 18px;">
+                            게임 시작하기
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card game-card" onclick="startGame('sequence')">
+                    <div class="card-header">
+                        <div class="game-icon icon-green">#</div>
+                        <div class="game-title">숫자 순서 기억하기</div>
+                        <div class="game-description">나타나는 숫자 순서를 기억하고 따라하세요</div>
+                    </div>
+                    <div class="card-content">
+                        <button class="btn btn-primary" style="width: 100%; padding: 16px; font-size: 18px;">
+                            게임 시작하기
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card game-card" onclick="startGame('pattern')">
+                    <div class="card-header">
+                        <div class="game-icon icon-purple">🎨</div>
+                        <div class="game-title">색깔 패턴 게임</div>
+                        <div class="game-description">색깔 패턴을 기억하고 순서대로 클릭하세요</div>
+                    </div>
+                    <div class="card-content">
+                        <button class="btn btn-primary" style="width: 100%; padding: 16px; font-size: 18px;">
+                            게임 시작하기
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card game-card" onclick="startGame('math')">
+                    <div class="card-header">
+                        <div class="game-icon icon-orange">🧮</div>
+                        <div class="game-title">간단한 계산 게임</div>
+                        <div class="game-description">기본적인 계산 문제를 풀어보세요</div>
+                    </div>
+                    <div class="card-content">
+                        <button class="btn btn-primary" style="width: 100%; padding: 16px; font-size: 18px;">
+                            게임 시작하기
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 기억력 카드 게임 -->
+        <div id="memory-game" class="hidden">
+            <div class="header">
+                <button class="btn btn-outline" onclick="showMainMenu()">
+                    ← 메뉴로 돌아가기
+                </button>
+                <button class="btn btn-outline" onclick="resetMemoryGame()">
+                    🔄 다시 시작
+                </button>
+            </div>
+
+            <div class="card" style="margin-bottom: 24px;">
+                <div class="card-header">
+                    <div class="game-title">🧠 기억력 카드 게임</div>
+                </div>
+                <div class="card-content">
+                    <div class="score-display">
+                        <div>매칭된 쌍: <span id="memory-matches">0</span>/8</div>
+                        <div>시도 횟수: <span id="memory-moves">0</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="memory-complete" class="card feedback correct hidden" style="margin-bottom: 24px;">
+                <div style="text-align: center; padding: 24px;">
+                    <h2 style="font-size: 24px; margin-bottom: 8px;">🎉 축하합니다!</h2>
+                    <p>총 <span id="final-moves">0</span>번의 시도로 게임을 완료했습니다!</p>
+                </div>
+            </div>
+
+            <div class="memory-grid" id="memory-cards"></div>
+        </div>
+
+        <!-- 숫자 순서 기억하기 게임 -->
+        <div id="sequence-game" class="hidden">
+            <div class="header">
+                <button class="btn btn-outline" onclick="showMainMenu()">
+                    ← 메뉴로 돌아가기
+                </button>
+                <button class="btn btn-outline" onclick="resetSequenceGame()">
+                    🔄 다시 시작
+                </button>
+            </div>
+
+            <div class="card" style="margin-bottom: 24px;">
+                <div class="card-header">
+                    <div class="game-title">🔢 숫자 순서 기억하기</div>
+                </div>
+                <div class="card-content">
+                    <div class="score-display">
+                        <div>레벨: <span id="sequence-level">1</span></div>
+                        <div>점수: <span id="sequence-score">0</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="sequence-waiting" class="card" style="margin-bottom: 24px;">
+                <div class="card-content" style="text-align: center; padding: 48px;">
+                    <h2 style="font-size: 20px; margin-bottom: 16px;">게임을 시작하세요!</h2>
+                    <p style="color: #6b7280; margin-bottom: 24px;">나타나는 숫자 순서를 기억하고 똑같이 입력하세요.</p>
+                    <button class="btn btn-primary" style="font-size: 18px; padding: 12px 32px;" onclick="startSequenceRound()">
+                        시작하기
+                    </button>
+                </div>
+            </div>
+
+            <div id="sequence-showing" class="card feedback hidden" style="margin-bottom: 24px; background: #dbeafe; border-color: #93c5fd;">
+                <div style="text-align: center; padding: 32px;">
+                    <h2 style="font-size: 20px; margin-bottom: 16px; color: #1e40af;">숫자를 기억하세요!</h2>
+                    <div class="sequence-display" id="sequence-display"></div>
+                </div>
+            </div>
+
+            <div id="sequence-input" class="card feedback hidden" style="margin-bottom: 24px; background: #fef3c7; border-color: #fcd34d;">
+                <div style="text-align: center; padding: 32px;">
+                    <h2 style="font-size: 20px; margin-bottom: 16px; color: #92400e;">순서대로 숫자를 클릭하세요!</h2>
+                    <div class="user-sequence" id="user-sequence"></div>
+                </div>
+            </div>
+
+            <div id="sequence-correct" class="card feedback correct hidden">
+                <div style="text-align: center; padding: 32px;">
+                    <h2 style="font-size: 24px; margin-bottom: 8px;">🎉 정답입니다!</h2>
+                    <p>다음 레벨로 진행합니다...</p>
+                </div>
+            </div>
+
+            <div id="sequence-wrong" class="card feedback wrong hidden">
+                <div style="text-align: center; padding: 32px;">
+                    <h2 style="font-size: 24px; margin-bottom: 8px;">❌ 틀렸습니다!</h2>
+                    <p>정답: <span id="sequence-answer"></span></p>
+                    <button class="btn" style="background: #dc2626; color: white; margin-top: 16px;" onclick="resetSequenceGame()">
+                        다시 도전하기
+                    </button>
+                </div>
+            </div>
+
+            <div class="number-grid" id="number-grid" style="display: none;">
+                <button class="btn btn-primary number-btn" onclick="selectNumber(1)">1</button>
+                <button class="btn btn-primary number-btn" onclick="selectNumber(2)">2</button>
+                <button class="btn btn-primary number-btn" onclick="selectNumber(3)">3</button>
+                <button class="btn btn-primary number-btn" onclick="selectNumber(4)">4</button>
+                <button class="btn btn-primary number-btn" onclick="selectNumber(5)">5</button>
+                <button class="btn btn-primary number-btn" onclick="selectNumber(6)">6</button>
+                <button class="btn btn-primary number-btn" onclick="selectNumber(7)">7</button>
+                <button class="btn btn-primary number-btn" onclick="selectNumber(8)">8</button>
+                <button class="btn btn-primary number-btn" onclick="selectNumber(9)">9</button>
+            </div>
+        </div>
+
+        <!-- 색깔 패턴 게임 -->
+        <div id="pattern-game" class="hidden">
+            <div class="header">
+                <button class="btn btn-outline" onclick="showMainMenu()">
+                    ← 메뉴로 돌아가기
+                </button>
+                <button class="btn btn-outline" onclick="resetPatternGame()">
+                    🔄 다시 시작
+                </button>
+            </div>
+
+            <div class="card" style="margin-bottom: 24px;">
+                <div class="card-header">
+                    <div class="game-title">🎨 색깔 패턴 게임</div>
+                </div>
+                <div class="card-content">
+                    <div class="score-display">
+                        <div>레벨: <span id="pattern-level">1</span></div>
+                        <div>점수: <span id="pattern-score">0</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="pattern-waiting" class="card" style="margin-bottom: 24px;">
+                <div class="card-content" style="text-align: center; padding: 48px;">
+                    <h2 style="font-size: 20px; margin-bottom: 16px;">게임을 시작하세요!</h2>
+                    <p style="color: #6b7280; margin-bottom: 24px;">깜빡이는 색깔 순서를 기억하고 똑같이 클릭하세요.</p>
+                    <button class="btn btn-primary" style="font-size: 18px; padding: 12px 32px;" onclick="startPatternRound()">
+                        시작하기
+                    </button>
+                </div>
+            </div>
+
+            <div id="pattern-showing" class="card feedback hidden" style="margin-bottom: 24px; background: #dbeafe; border-color: #93c5fd;">
+                <div style="text-align: center; padding: 32px;">
+                    <h2 style="font-size: 20px; margin-bottom: 16px; color: #1e40af;">색깔 순서를 기억하세요!</h2>
+                    <p style="color: #6b7280;">패턴 길이: <span id="pattern-length">0</span></p>
+                </div>
+            </div>
+
+            <div id="pattern-input" class="card feedback hidden" style="margin-bottom: 24px; background: #fef3c7; border-color: #fcd34d;">
+                <div style="text-align: center; padding: 32px;">
+                    <h2 style="font-size: 20px; margin-bottom: 16px; color: #92400e;">순서대로 색깔을 클릭하세요!</h2>
+                    <div class="pattern-indicators" id="pattern-indicators"></div>
+                </div>
+            </div>
+
+            <div id="pattern-correct" class="card feedback correct hidden">
+                <div style="text-align: center; padding: 32px;">
+                    <h2 style="font-size: 24px; margin-bottom: 8px;">🎉 정답입니다!</h2>
+                    <p>다음 레벨로 진행합니다...</p>
+                </div>
+            </div>
+
+            <div id="pattern-wrong" class="card feedback wrong hidden">
+                <div style="text-align: center; padding: 32px;">
+                    <h2 style="font-size: 24px; margin-bottom: 8px;">❌ 틀렸습니다!</h2>
+                    <div style="margin: 16px 0;">
+                        <span style="color: #dc2626;">정답: </span>
+                        <div class="pattern-indicators" id="pattern-answer" style="display: inline-flex;"></div>
+                    </div>
+                    <button class="btn" style="background: #dc2626; color: white; margin-top: 16px;" onclick="resetPatternGame()">
+                        다시 도전하기
+                    </button>
+                </div>
+            </div>
+
+            <div class="color-grid">
+                <button class="color-btn color-red" onclick="selectColor('red')">빨강</button>
+                <button class="color-btn color-blue" onclick="selectColor('blue')">파랑</button>
+                <button class="color-btn color-green" onclick="selectColor('green')">초록</button>
+                <button class="color-btn color-yellow" onclick="selectColor('yellow')">노랑</button>
+                <button class="color-btn color-purple" onclick="selectColor('purple')">보라</button>
+                <button class="color-btn color-pink" onclick="selectColor('pink')">분홍</button>
+            </div>
+        </div>
+
+        <!-- 계산 게임 -->
+        <div id="math-game" class="hidden">
+            <div class="header">
+                <button class="btn btn-outline" onclick="showMainMenu()">
+                    ← 메뉴로 돌아가기
+                </button>
+                <button class="btn btn-outline" onclick="resetMathGame()">
+                    🔄 다시 시작
+                </button>
+            </div>
+
+            <div class="card" style="margin-bottom: 24px;">
+                <div class="card-header">
+                    <div class="game-title">🧮 간단한 계산 게임</div>
+                </div>
+                <div class="card-content">
+                    <div class="score-display">
+                        <div>문제: <span id="math-question">1</span>/10</div>
+                        <div>점수: <span id="math-score">0</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="math-feedback" class="hidden"></div>
+
+            <div id="math-complete" class="card hidden" style="margin-bottom: 24px;">
+                <div class="card-header">
+                    <div class="game-title">🎉 게임 완료!</div>
+                </div>
+                <div class="card-content" style="text-align: center; padding: 32px;">
+                    <div style="font-size: 64px; margin-bottom: 16px;" id="math-trophy">🏆</div>
+                    <h2 style="font-size: 32px; font-weight: bold; margin-bottom: 16px;">
+                        최종 점수: <span id="final-score">0</span>/10
+                    </h2>
+                    <p style="font-size: 20px; color: #6b7280; margin-bottom: 24px;">
+                        정답률: <span id="final-percentage">0</span>%
+                    </p>
+                    <div style="margin-bottom: 24px;">
+                        <p id="final-message" style="font-size: 18px; font-weight: 600;"></p>
+                    </div>
+                    <button class="btn btn-primary" style="font-size: 18px; padding: 12px 32px;" onclick="resetMathGame()">
+                        다시 도전하기
+                    </button>
+                </div>
+            </div>
+
+            <div id="math-problem-card" class="card" style="margin-bottom: 32px;">
+                <div class="card-content">
+                    <div class="math-problem" id="math-problem">2 + 3 = ?</div>
+                </div>
+            </div>
+
+            <div class="math-options" id="math-options"></div>
+        </div>
+    </div>
+
+    <script>
+        // 전역 변수들
+        let currentGame = 'menu';
+        
+        // 기억력 게임 변수들
+        let memoryCards = [];
+        let flippedCards = [];
+        let matchedPairs = 0;
+        let moves = 0;
+        const emojis = ['🌸', '🌞', '🌈', '🍎', '🐶', '🐱', '🦋', '⭐'];
+
+        // 숫자 순서 게임 변수들
+        let sequence = [];
+        let userSequence = [];
+        let sequenceLevel = 1;
+        let sequenceScore = 0;
+        let sequenceState = 'waiting';
+
+        // 색깔 패턴 게임 변수들
+        let colorPattern = [];
+        let userColorPattern = [];
+        let patternLevel = 1;
+        let patternScore = 0;
+        let patternState = 'waiting';
+        let currentShowIndex = -1;
+        const colors = [
+            { name: 'red', class: 'color-red', text: '빨강' },
+            { name: 'blue', class: 'color-blue', text: '파랑' },
+            { name: 'green', class: 'color-green', text: '초록' },
+            { name: 'yellow', class: 'color-yellow', text: '노랑' },
+            { name: 'purple', class: 'color-purple', text: '보라' },
+            { name: 'pink', class: 'color-pink', text: '분홍' }
+        ];
+
+        // 계산 게임 변수들
+        let currentMathProblem = null;
+        let mathScore = 0;
+        let mathQuestionNumber = 1;
+        let mathFeedback = null;
+
+        // 유틸리티 함수들
+        function hideAllScreens() {
+            document.getElementById('main-menu').classList.add('hidden');
+            document.getElementById('memory-game').classList.add('hidden');
+            document.getElementById('sequence-game').classList.add('hidden');
+            document.getElementById('pattern-game').classList.add('hidden');
+            document.getElementById('math-game').classList.add('hidden');
+        }
+
+        function showMainMenu() {
+            hideAllScreens();
+            document.getElementById('main-menu').classList.remove('hidden');
+            currentGame = 'menu';
+        }
+
+        function startGame(gameType) {
+            hideAllScreens();
+            currentGame = gameType;
+            
+            switch(gameType) {
+                case 'memory':
+                    document.getElementById('memory-game').classList.remove('hidden');
+                    initMemoryGame();
+                    break;
+                case 'sequence':
+                    document.getElementById('sequence-game').classList.remove('hidden');
+                    resetSequenceGame();
+                    break;
+                case 'pattern':
+                    document.getElementById('pattern-game').classList.remove('hidden');
+                    resetPatternGame();
+                    break;
+                case 'math':
+                    document.getElementById('math-game').classList.remove('hidden');
+                    resetMathGame();
+                    break;
+            }
+        }
+
+        // 기억력 게임 함수들
+        function initMemoryGame() {
+            const gameCards = [...emojis, ...emojis]
+                .sort(() => Math.random() - 0.5)
+                .map((emoji, index) => ({
+                    id: index,
+                    emoji,
+                    isFlipped: false,
+                    isMatched: false
+                }));
+
+            memoryCards = gameCards;
+            flippedCards = [];
+            matchedPairs = 0;
+            moves = 0;
+            
+            updateMemoryDisplay();
+            renderMemoryCards();
+        }
+
+        function updateMemoryDisplay() {
+            document.getElementById('memory-matches').textContent = matchedPairs;
+            document.getElementById('memory-moves').textContent = moves;
+        }
+
+        function renderMemoryCards() {
+            const container = document.getElementById('memory-cards');
+            container.innerHTML = '';
+
+            memoryCards.forEach(card => {
+                const cardElement = document.createElement('button');
+                cardElement.className = `memory-card ${card.isFlipped || card.isMatched ? 'flipped' : 'hidden-card'}`;
+                cardElement.textContent = card.isFlipped || card.isMatched ? card.emoji : '?';
+                cardElement.onclick = () => handleMemoryCardClick(card.id);
+                cardElement.disabled = card.isFlipped || card.isMatched || flippedCards.length === 2;
+                container.appendChild(cardElement);
+            });
+        }
+
+        function handleMemoryCardClick(cardId) {
+            if (flippedCards.length === 2) return;
+            if (memoryCards[cardId].isFlipped || memoryCards[cardId].isMatched) return;
+
+            memoryCards[cardId].isFlipped = true;
+            flippedCards.push(cardId);
+            renderMemoryCards();
+
+            if (flippedCards.length === 2) {
+                const [first, second] = flippedCards;
+                const firstCard = memoryCards[first];
+                const secondCard = memoryCards[second];
+
+                moves++;
+                updateMemoryDisplay();
+
+                if (firstCard.emoji === secondCard.emoji) {
+                    memoryCards[first].isMatched = true;
+                    memoryCards[second].isMatched = true;
+                    matchedPairs++;
+                    flippedCards = [];
+                    updateMemoryDisplay();
+                    renderMemoryCards();
+
+                    if (matchedPairs === emojis.length) {
+                        document.getElementById('final-moves').textContent = moves;
+                        document.getElementById('memory-complete').classList.remove('hidden');
+                    }
+                } else {
+                    setTimeout(() => {
+                        memoryCards[first].isFlipped = false;
+                        memoryCards[second].isFlipped = false;
+                        flippedCards = [];
+                        renderMemoryCards();
+                    }, 1000);
+                }
+            }
+        }
+
+        function resetMemoryGame() {
+            document.getElementById('memory-complete').classList.add('hidden');
+            initMemoryGame();
+        }
+
+        // 숫자 순서 게임 함수들
+        function resetSequenceGame() {
+            sequenceLevel = 1;
+            sequenceScore = 0;
+            sequence = [];
+            userSequence = [];
+            sequenceState = 'waiting';
+            updateSequenceDisplay();
+            showSequenceWaiting();
+        }
+
+        function updateSequenceDisplay() {
+            document.getElementById('sequence-level').textContent = sequenceLevel;
+            document.getElementById('sequence-score').textContent = sequenceScore;
+        }
+
+        function showSequenceWaiting() {
+            hideSequenceScreens();
+            document.getElementById('sequence-waiting').classList.remove('hidden');
+            document.getElementById('number-grid').style.display = 'none';
+        }
+
+        function hideSequenceScreens() {
+            document.getElementById('sequence-waiting').classList.add('hidden');
+            document.getElementById('sequence-showing').classList.add('hidden');
+            document.getElementById('sequence-input').classList.add('hidden');
+            document.getElementById('sequence-correct').classList.add('hidden');
+            document.getElementById('sequence-wrong').classList.add('hidden');
+        }
+
+        function generateSequence(length) {
+            const newSequence = [];
+            for (let i = 0; i < length; i++) {
+                newSequence.push(Math.floor(Math.random() * 9) + 1);
+            }
+            return newSequence;
+        }
+
+        function startSequenceRound() {
+            sequence = generateSequence(sequenceLevel + 2);
+            userSequence = [];
+            sequenceState = 'showing';
+            showSequencePattern();
+        }
+
+        async function showSequencePattern() {
+            hideSequenceScreens();
+            document.getElementById('sequence-showing').classList.remove('hidden');
+            
+            const display = document.getElementById('sequence-display');
+            display.innerHTML = '';
+            
+            sequence.forEach((num, index) => {
+                const numElement = document.createElement('div');
+                numElement.className = 'sequence-number';
+                numElement.textContent = num;
+                numElement.style.opacity = '0.3';
+                display.appendChild(numElement);
+            });
+
+            for (let i = 0; i < sequence.length; i++) {
+                await new Promise(resolve => setTimeout(resolve, 800));
+                display.children[i].style.opacity = '1';
+                await new Promise(resolve => setTimeout(resolve, 600));
+                display.children[i].style.opacity = '0.3';
+            }
+
+            sequenceState = 'input';
+            showSequenceInput();
+        }
+
+        function showSequenceInput() {
+            hideSequenceScreens();
+            document.getElementById('sequence-input').classList.remove('hidden');
+            document.getElementById('number-grid').style.display = 'grid';
+            updateUserSequenceDisplay();
+        }
+
+        function updateUserSequenceDisplay() {
+            const container = document.getElementById('user-sequence');
+            container.innerHTML = '';
+
+            userSequence.forEach(num => {
+                const numElement = document.createElement('div');
+                numElement.className = 'user-number';
+                numElement.textContent = num;
+                container.appendChild(numElement);
+            });
+
+            for (let i = userSequence.length; i < sequence.length; i++) {
+                const emptyElement = document.createElement('div');
+                emptyElement.className = 'empty-slot';
+                emptyElement.textContent = '?';
+                container.appendChild(emptyElement);
+            }
+        }
+
+        function selectNumber(number) {
+            if (sequenceState !== 'input') return;
+            
+            userSequence.push(number);
+            updateUserSequenceDisplay();
+
+            if (userSequence.length === sequence.length) {
+                const isCorrect = userSequence.every((num, index) => num === sequence[index]);
+                
+                if (isCorrect) {
+                    sequenceScore += sequenceLevel * 10;
+                    updateSequenceDisplay();
+                    showSequenceCorrect();
+                    setTimeout(() => {
+                        sequenceLevel++;
+                        startSequenceRound();
+                    }, 2000);
+                } else {
+                    showSequenceWrong();
+                }
+            }
+        }
+
+        function showSequenceCorrect() {
+            hideSequenceScreens();
+            document.getElementById('sequence-correct').classList.remove('hidden');
+            document.getElementById('number-grid').style.display = 'none';
+        }
+
+        function showSequenceWrong() {
+            hideSequenceScreens();
+            document.getElementById('sequence-answer').textContent = sequence.join(' → ');
+            document.getElementById('sequence-wrong').classList.remove('hidden');
+            document.getElementById('number-grid').style.display = 'none';
+        }
+
+        // 색깔 패턴 게임 함수들
+        function resetPatternGame() {
+            patternLevel = 1;
+            patternScore = 0;
+            colorPattern = [];
+            userColorPattern = [];
+            patternState = 'waiting';
+            currentShowIndex = -1;
+            updatePatternDisplay();
+            showPatternWaiting();
+        }
+
+        function updatePatternDisplay() {
+            document.getElementById('pattern-level').textContent = patternLevel;
+            document.getElementById('pattern-score').textContent = patternScore;
+        }
+
+        function showPatternWaiting() {
+            hidePatternScreens();
+            document.getElementById('pattern-waiting').classList.remove('hidden');
+            resetColorButtons();
+        }
+
+        function hidePatternScreens() {
+            document.getElementById('pattern-waiting').classList.add('hidden');
+            document.getElementById('pattern-showing').classList.add('hidden');
+            document.getElementById('pattern-input').classList.add('hidden');
+            document.getElementById('pattern-correct').classList.add('hidden');
+            document.getElementById('pattern-wrong').classList.add('hidden');
+        }
+
+        function generateColorPattern(length) {
+            const newPattern = [];
+            for (let i = 0; i < length; i++) {
+                const randomColor = colors[Math.floor(Math.random() * colors.length)];
+                newPattern.push(randomColor.name);
+            }
+            return newPattern;
+        }
+
+        function startPatternRound() {
+            colorPattern = generateColorPattern(patternLevel + 2);
+            userColorPattern = [];
+            patternState = 'showing';
+            showColorPattern();
+        }
+
+        async function showColorPattern() {
+            hidePatternScreens();
+            document.getElementById('pattern-showing').classList.remove('hidden');
+            document.getElementById('pattern-length').textContent = colorPattern.length;
+            
+            resetColorButtons();
+
+            for (let i = 0; i < colorPattern.length; i++) {
+                currentShowIndex = i;
+                highlightColor(colorPattern[i]);
+                await new Promise(resolve => setTimeout(resolve, 800));
+                resetColorButtons();
+                await new Promise(resolve => setTimeout(resolve, 200));
+            }
+
+            currentShowIndex = -1;
+            patternState = 'input';
+            showPatternInput();
+        }
+
+        function highlightColor(colorName) {
+            const colorButtons = document.querySelectorAll('.color-btn');
+            colorButtons.forEach(btn => {
+                if (btn.classList.contains(`color-${colorName}`)) {
+                    btn.classList.add('active');
+                }
+            });
+        }
+
+        function resetColorButtons() {
+            const colorButtons = document.querySelectorAll('.color-btn');
+            colorButtons.forEach(btn => {
+                btn.classList.remove('active');
+            });
+        }
+
+        function showPatternInput() {
+            hidePatternScreens();
+            document.getElementById('pattern-input').classList.remove('hidden');
+            updatePatternIndicators();
+        }
+
+        function updatePatternIndicators() {
+            const container = document.getElementById('pattern-indicators');
+            container.innerHTML = '';
+
+            userColorPattern.forEach(colorName => {
+                const dot = document.createElement('div');
+                dot.className = `pattern-dot color-${colorName}`;
+                container.appendChild(dot);
+            });
+
+            for (let i = userColorPattern.length; i < colorPattern.length; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'pattern-dot';
+                dot.style.background = '#e5e7eb';
+                container.appendChild(dot);
+            }
+        }
+
+        function selectColor(colorName) {
+            if (patternState !== 'input') return;
+            
+            userColorPattern.push(colorName);
+            updatePatternIndicators();
+
+            if (userColorPattern.length === colorPattern.length) {
+                const isCorrect = userColorPattern.every((color, index) => color === colorPattern[index]);
+                
+                if (isCorrect) {
+                    patternScore += patternLevel * 15;
+                    updatePatternDisplay();
+                    showPatternCorrect();
+                    setTimeout(() => {
+                        patternLevel++;
+                        startPatternRound();
+                    }, 2000);
+                } else {
+                    showPatternWrong();
+                }
+            }
+        }
+
+        function showPatternCorrect() {
+            hidePatternScreens();
+            document.getElementById('pattern-correct').classList.remove('hidden');
+        }
+
+        function showPatternWrong() {
+            hidePatternScreens();
+            const answerContainer = document.getElementById('pattern-answer');
+            answerContainer.innerHTML = '';
+            
+            colorPattern.forEach(colorName => {
+                const dot = document.createElement('div');
+                dot.className = `pattern-dot color-${colorName}`;
+                dot.style.width = '24px';
+                dot.style.height = '24px';
+                dot.style.border = '1px solid #9ca3af';
+                answerContainer.appendChild(dot);
+            });
+            
+            document.getElementById('pattern-wrong').classList.remove('hidden');
+        }
+
+        // 계산 게임 함수들
+        function resetMathGame() {
+            mathScore = 0;
+            mathQuestionNumber = 1;
+            mathFeedback = null;
+            document.getElementById('math-complete').classList.add('hidden');
+            document.getElementById('math-problem-card').classList.remove('hidden');
+            document.getElementById('math-options').style.display = 'grid';
+            updateMathDisplay();
+            generateMathProblem();
+        }
+
+        function updateMathDisplay() {
+            document.getElementById('math-question').textContent = mathQuestionNumber;
+            document.getElementById('math-score').textContent = mathScore;
+        }
+
+        function generateMathProblem() {
+            const operators = ['+', '-', '×'];
+            const operator = operators[Math.floor(Math.random() * operators.length)];
+            
+            let num1, num2, answer;
+
+            switch (operator) {
+                case '+':
+                    num1 = Math.floor(Math.random() * 50) + 1;
+                    num2 = Math.floor(Math.random() * 50) + 1;
+                    answer = num1 + num2;
+                    break;
+                case '-':
+                    num1 = Math.floor(Math.random() * 50) + 20;
+                    num2 = Math.floor(Math.random() * (num1 - 1)) + 1;
+                    answer = num1 - num2;
+                    break;
+                case '×':
+                    num1 = Math.floor(Math.random() * 12) + 1;
+                    num2 = Math.floor(Math.random() * 12) + 1;
+                    answer = num1 * num2;
+                    break;
+            }
+
+            const options = [answer];
+            while (options.length < 4) {
+                let wrongAnswer = answer + Math.floor(Math.random() * 20) - 10;
+                if (wrongAnswer > 0 && !options.includes(wrongAnswer)) {
+                    options.push(wrongAnswer);
+                }
+            }
+
+            options.sort(() => Math.random() - 0.5);
+
+            currentMathProblem = { num1, num2, operator, answer, options };
+            
+            document.getElementById('math-problem').textContent = `${num1} ${operator} ${num2} = ?`;
+            
+            const optionsContainer = document.getElementById('math-options');
+            optionsContainer.innerHTML = '';
+            
+            options.forEach(option => {
+                const button = document.createElement('button');
+                button.className = 'btn btn-primary math-btn';
+                button.textContent = option;
+                button.onclick = () => handleMathAnswer(option);
+                optionsContainer.appendChild(button);
+            });
+        }
+
+        function handleMathAnswer(selectedAnswer) {
+            if (!currentMathProblem) return;
+
+            const feedbackContainer = document.getElementById('math-feedback');
+            
+            if (selectedAnswer === currentMathProblem.answer) {
+                mathScore++;
+                mathFeedback = 'correct';
+                feedbackContainer.className = 'card feedback correct';
+                feedbackContainer.innerHTML = `
+                    <div style="text-align: center; padding: 24px;">
+                        <h2 style="font-size: 24px; margin-bottom: 8px;">🎉 정답입니다!</h2>
+                    </div>
+                `;
+            } else {
+                mathFeedback = 'wrong';
+                feedbackContainer.className = 'card feedback wrong';
+                feedbackContainer.innerHTML = `
+                    <div style="text-align: center; padding: 24px;">
+                        <h2 style="font-size: 24px; margin-bottom: 8px;">❌ 틀렸습니다!</h2>
+                        <p>정답: ${currentMathProblem.answer}</p>
+                    </div>
+                `;
+            }
+
+            feedbackContainer.classList.remove('hidden');
+            document.getElementById('math-options').style.display = 'none';
+
+            setTimeout(() => {
+                feedbackContainer.classList.add('hidden');
+                
+                if (mathQuestionNumber >= 10) {
+                    showMathComplete();
+                } else {
+                    mathQuestionNumber++;
+                    updateMathDisplay();
+                    generateMathProblem();
+                    document.getElementById('math-options').style.display = 'grid';
+                }
+            }, 1500);
+        }
+
+        function showMathComplete() {
+            document.getElementById('math-problem-card').classList.add('hidden');
+            document.getElementById('math-options').style.display = 'none';
+            
+            const percentage = Math.round((mathScore / 10) * 100);
+            
+            document.getElementById('final-score').textContent = mathScore;
+            document.getElementById('final-percentage').textContent = percentage;
+            
+            const trophy = document.getElementById('math-trophy');
+            const message = document.getElementById('final-message');
+            
+            if (percentage >= 80) {
+                trophy.textContent = '🏆';
+                message.textContent = '훌륭합니다! 🌟';
+                message.style.color = '#059669';
+            } else if (percentage >= 60) {
+                trophy.textContent = '🥈';
+                message.textContent = '잘했어요! 👍';
+                message.style.color = '#2563eb';
+            } else {
+                trophy.textContent = '🥉';
+                message.textContent = '더 연습해보세요! 💪';
+                message.style.color = '#d97706';
+            }
+            
+            document.getElementById('math-complete').classList.remove('hidden');
+        }
+
+        // 초기화
+        document.addEventListener('DOMContentLoaded', function() {
+            showMainMenu();
+        });
+    </script>
+</body>
+</html>
